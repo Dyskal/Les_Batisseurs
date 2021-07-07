@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Les Bâtisseurs" default="init" basedir=".">
+    <description>
+        Build file of the game Les Batisseurs - Moyen-Age
+    </description>
+
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+    <property name="libs" location="lib"/>
+    <property name="jar" location="${build}/jar"/>
+    <property name="class" location="${build}/class"/>
+    <property name="javadoc" location="${build}/javadoc"/>
+    <property name="mainClass" value="Main"/>
+    <property name="version" value="1.0"/>
+    <property name="jarName" value="${mainClass}-${version}"/>
+    <property name="test" value="${build}/test"/>
+
+    <target name="init">
+        <!-- Create the directories used to store the data -->
+        <mkdir dir="${build}"/>
+        <mkdir dir="${jar}"/>
+        <mkdir dir="${class}"/>
+        <mkdir dir="${test}"/>
+    </target>
+
+    <target name="clean">
+        <!-- Clean all the build files -->
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <!-- Compile the code from ${src} and place it into ${class} excluding the test package -->
+        <javac srcdir="${src}" destdir="${class}" includeantruntime="false">
+            <exclude name="test/**"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <!-- Create the jar file with the compiled files in ${class}-->
+        <copy todir="${class}/resources">
+            <fileset dir="${src}/resources"/>
+        </copy>
+        <jar jarfile="${jar}/${jarName}.jar" basedir="${class}">
+            <manifest>
+                <attribute name="Main-Class" value="${mainClass}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar">
+        <!-- Run the built jar at ${jar} -->
+        <java jar="${jar}/${jarName}.jar" fork="true">
+            <arg value="-Dfile.encoding=UTF-8"/>
+        </java>
+    </target>
+
+    <target name="javadoc" depends="compile">
+        <!-- Create the javadoc of the code -->
+        <delete dir="${javadoc}"/>
+        <javadoc author="true" private="true" destdir="${javadoc}">
+            <fileset dir="${src}">
+                <exclude name="test/**"/>
+                <exclude name="resources/**"/>
+                <exclude name="META-INF/**"/>
+                <include name="**"/>
+            </fileset>
+        </javadoc>
+    </target>
+
+    <target name="test-compile" depends="compile">
+        <!-- Compile the code from ${src}/test and place it into ${test} -->
+        <javac srcdir="${src}/test" destdir="${test}" includeantruntime="true" >
+            <classpath>
+                <pathelement location="lib/hamcrest-core-1.3.jar"/>
+                <pathelement location="lib/junit-4.13.2.jar"/>
+                <pathelement path="${class}"/>
+                <pathelement path="${java.class.path}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" depends="test-compile">
+        <!-- Launch all the test classes -->
+        <junit printsummary="on" haltonfailure="off" fork="true" includeantruntime="true">
+            <classpath>
+                <pathelement location="lib/hamcrest-core-1.3.jar"/>
+                <pathelement location="lib/junit-4.13.2.jar"/>
+                <pathelement path="${test}"/>
+                <pathelement path="${class}"/>
+                <pathelement path="${java.class.path}"/>
+            </classpath>
+            <formatter type="brief"/>
+            <batchtest todir="${test}">
+                <fileset dir="${src}" includes="test/*.java"/>
+            </batchtest>
+        </junit>
+    </target>
+
+</project>
