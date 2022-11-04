@@ -1,4 +1,4 @@
-Bienvenue dans Les Bâtisseurs - Moyen-Âge !
+# Bienvenue dans Les Bâtisseurs - Moyen-Âge !
 
 Les Bâtisseurs - Moyen-Âge est un jeu se jouant de 2 à 4 joueurs.
 
